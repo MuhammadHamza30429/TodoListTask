@@ -1,63 +1,13 @@
+// Countries.js
 import React, {useState, useEffect} from 'react';
 import {View, TextInput, Alert, TouchableOpacity} from 'react-native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Picker} from '@react-native-picker/picker';
+import {fetchCountries} from './Component/CountriesComponent/ApiServices'; // Import the fetchCountries function
 import DarkModeSwitch from './Component/DarkModeSwitch';
 import AssignUser from './Component/UserAssigned';
 import CustomButton from './Component/CustomButton';
 import TaskList from './Component/DataList';
-
-const useTasks = () => {
-  const [tasks, setTasks] = useState([]);
-
-  useEffect(() => {
-    loadTasks();
-  }, []);
-
-  const loadTasks = async () => {
-    try {
-      const savedTasks = await AsyncStorage.getItem('tasks');
-      if (savedTasks) setTasks(JSON.parse(savedTasks));
-    } catch (error) {
-      console.error('Error loading tasks:', error);
-    }
-  };
-
-  const saveTask = async newTask => {
-    const updatedTasks = [...tasks, newTask];
-    setTasks(updatedTasks);
-    try {
-      await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    } catch (error) {
-      console.error('Error saving tasks:', error);
-    }
-  };
-
-  const deleteTask = async index => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
-    try {
-      await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
-  };
-
-  const updateTask = async (index, updatedTask) => {
-    const updatedTasks = tasks.map((task, i) =>
-      i === index ? updatedTask : task,
-    );
-    setTasks(updatedTasks);
-    try {
-      await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
-  };
-
-  return {tasks, saveTask, deleteTask, updateTask};
-};
+import useTasks from './Component/CountriesComponent/Hooks';
+import {Picker} from '@react-native-picker/picker';
 
 const Countries = () => {
   const {tasks, saveTask, deleteTask, updateTask} = useTasks();
@@ -66,21 +16,20 @@ const Countries = () => {
   const [country, setCountry] = useState('');
   const [countries, setCountries] = useState([]);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
-  const [modalVisible, setModalVisible] = useState(true); // Show modal initially
+  const [modalVisible, setModalVisible] = useState(true);
   const [editingIndex, setEditingIndex] = useState(null);
 
   useEffect(() => {
-    fetchCountries();
+    const loadCountries = async () => {
+      try {
+        const countriesList = await fetchCountries();
+        setCountries(countriesList);
+      } catch (error) {
+        Alert.alert('Error fetching countries. Please try again.');
+      }
+    };
+    loadCountries();
   }, []);
-
-  const fetchCountries = async () => {
-    try {
-      const response = await axios.get('https://restcountries.com/v3.1/all');
-      setCountries(response.data.map(country => country.name.common));
-    } catch (error) {
-      Alert.alert('Error fetching countries. Please try again.');
-    }
-  };
 
   const handleSaveTask = () => {
     if (description.length > 120) {
@@ -94,15 +43,14 @@ const Countries = () => {
 
     const newTask = {description, user, country};
     if (editingIndex !== null) {
-      updateTask(editingIndex, newTask); // Update existing task
-      setEditingIndex(null); // Reset editing index
+      updateTask(editingIndex, newTask);
+      setEditingIndex(null);
       Alert.alert('Edit Success');
     } else {
-      saveTask(newTask); // Save new task
+      saveTask(newTask);
       Alert.alert('Save Success');
     }
 
-    // Clear input fields and hide modal
     clearFields();
     setModalVisible(false);
   };
@@ -118,8 +66,8 @@ const Countries = () => {
     setDescription(taskToEdit.description);
     setUser(taskToEdit.user);
     setCountry(taskToEdit.country);
-    setEditingIndex(index); // Set the index of the task being edited
-    setModalVisible(true); // Open the modal for editing
+    setEditingIndex(index);
+    setModalVisible(true);
   };
 
   return (
@@ -161,7 +109,7 @@ const Countries = () => {
           selectedValue={country}
           onValueChange={setCountry}
           style={{
-            height: 50, // Set height manually as `className` won't work with Picker
+            height: 50,
             width: '100%',
             color: isDarkTheme ? 'white' : 'black',
             backgroundColor: isDarkTheme ? '#1e1e1e' : '#ffffff',
