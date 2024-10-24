@@ -1,88 +1,56 @@
-// DataList.js
 import React from 'react';
-import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const DataList = ({tasks, deleteTask, editTask, isDarkTheme}) => {
   return (
-    <FlatList
-      data={tasks}
-      keyExtractor={(_, index) => index.toString()}
-      renderItem={({item, index}) => (
-        <View
-          style={[
-            styles.card,
-            isDarkTheme ? styles.darkCard : styles.lightCard,
-          ]}>
-          <View style={styles.row}>
-            <Text
-              style={[
-                styles.userCountryText,
-                {color: isDarkTheme ? 'white' : 'black'},
-              ]}>
-              {item.user} ({item.country})
-            </Text>
-            <View style={styles.iconContainer}>
-              <TouchableOpacity onPress={() => editTask(index)}>
-                <Icon name="create-outline" size={24} color="blue" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => deleteTask(index)}>
-                <Icon name="trash-outline" size={24} color="red" />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <Text
-            style={[
-              styles.descriptionText,
-              {color: isDarkTheme ? 'lightgray' : 'black'},
-            ]}>
-            {item.description}
-          </Text>
-        </View>
+    <View className="w-full">
+      {/* Conditionally render the heading if there are tasks */}
+      {tasks.length > 0 && (
+        <Text
+          className={`text-lg font-bold text-center mb-4 ${
+            isDarkTheme ? 'text-white' : 'text-black'
+          }`}>
+          Task List
+        </Text>
       )}
-    />
+      <FlatList
+        data={tasks}
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={({item, index}) => (
+          <View
+            className={`w-full p-4 mb-2 rounded-lg shadow-lg ${
+              isDarkTheme ? 'bg-neutral-900' : 'bg-white'
+            }`}>
+            <View className="flex-row justify-between items-center w-full">
+              <Text
+                className={`font-bold ${
+                  isDarkTheme ? 'text-white' : 'text-black'
+                }`}>
+                {item.user} ({item.country})
+              </Text>
+              <View className="flex-row items-center">
+                <TouchableOpacity onPress={() => editTask(index)}>
+                  <Icon name="create-outline" size={24} color="blue" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => deleteTask(index)}
+                  className="ml-2">
+                  <Icon name="trash-outline" size={24} color="red" />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <Text
+              className={`mt-1 text-sm ${
+                isDarkTheme ? 'text-gray-400' : 'text-black'
+              }`}>
+              {item.description}
+            </Text>
+          </View>
+        )}
+      />
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    width: '100%', // Set card width to 100% to take full screen width
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 10,
-    elevation: 2, // Add shadow for Android
-    shadowColor: '#000', // Add shadow for iOS
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-  },
-  darkCard: {
-    backgroundColor: '#1e1e1e', // Dark mode background
-  },
-  lightCard: {
-    backgroundColor: '#ffffff', // Light mode background
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-  },
-  iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  userCountryText: {
-    fontWeight: 'bold',
-  },
-  descriptionText: {
-    marginTop: 5, // Add space between the user/country row and description
-    fontSize: 14,
-  },
-});
 
 export default DataList;

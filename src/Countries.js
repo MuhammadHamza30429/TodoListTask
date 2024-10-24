@@ -1,11 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  View,
-  TextInput,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {View, TextInput, Alert, TouchableOpacity} from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Picker} from '@react-native-picker/picker';
@@ -102,8 +96,10 @@ const Countries = () => {
     if (editingIndex !== null) {
       updateTask(editingIndex, newTask); // Update existing task
       setEditingIndex(null); // Reset editing index
+      Alert.alert('Edit Success');
     } else {
       saveTask(newTask); // Save new task
+      Alert.alert('Save Success');
     }
 
     // Clear input fields and hide modal
@@ -128,10 +124,9 @@ const Countries = () => {
 
   return (
     <View
-      style={[
-        styles.container,
-        isDarkTheme ? styles.darkBackground : styles.lightBackground,
-      ]}>
+      className={`p-4 items-center w-full h-full ${
+        isDarkTheme ? 'bg-[#121212]' : 'bg-white'
+      }`}>
       <DarkModeSwitch
         isDarkTheme={isDarkTheme}
         toggleSwitch={() => setIsDarkTheme(!isDarkTheme)}
@@ -140,51 +135,61 @@ const Countries = () => {
         onUserSelect={setUser}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        selectedUser={user} // Pass selected user for editing
+        selectedUser={user}
+        currentUser={user}
+        isDarkTheme={isDarkTheme}
       />
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
-        style={[
-          styles.input,
-          isDarkTheme ? styles.darkInput : styles.lightInput,
-        ]}>
+        className={`w-full p-2 mb-3 border ${
+          isDarkTheme
+            ? 'bg-[#1e1e1e] border-gray-700'
+            : 'bg-white border-gray-300'
+        }`}>
         <TextInput
           placeholder="Click Me.."
           value={user}
           onChangeText={setUser}
-          onFocus={() => setModalVisible(true)} // Open modal on focus
+          onFocus={() => setModalVisible(true)}
           editable={false}
-          style={[isDarkTheme ? styles.darkInput : styles.lightInput]}
+          className={`${isDarkTheme ? 'text-white' : 'text-black'}`}
           placeholderTextColor={isDarkTheme ? '#bbbbbb' : '#888888'}
         />
       </TouchableOpacity>
-      <Picker
-        selectedValue={country}
-        onValueChange={setCountry}
-        style={[
-          styles.picker,
-          isDarkTheme ? styles.darkPicker : styles.lightPicker,
-        ]}>
-        <Picker.Item label="Select Country" value="" />
-        {countries.map((countryName, index) => (
-          <Picker.Item key={index} label={countryName} value={countryName} />
-        ))}
-      </Picker>
+      <View className="w-full h-12 mb-6">
+        <Picker
+          selectedValue={country}
+          onValueChange={setCountry}
+          style={{
+            height: 50, // Set height manually as `className` won't work with Picker
+            width: '100%',
+            color: isDarkTheme ? 'white' : 'black',
+            backgroundColor: isDarkTheme ? '#1e1e1e' : '#ffffff',
+          }}
+          dropdownIconColor={isDarkTheme ? 'white' : 'black'}>
+          <Picker.Item label="Select Country" value="" />
+          {countries.map((countryName, index) => (
+            <Picker.Item key={index} label={countryName} value={countryName} />
+          ))}
+        </Picker>
+      </View>
+
       <TextInput
         placeholder="Description"
         value={description}
         onChangeText={setDescription}
         multiline={true}
         numberOfLines={4}
-        style={[
-          styles.input,
-          isDarkTheme ? styles.darkInput : styles.lightInput,
-          styles.textArea,
-        ]}
+        className={`w-full p-2 border h-24 mb-3 ${
+          isDarkTheme
+            ? 'bg-[#1e1e1e] border-gray-700 text-white'
+            : 'bg-white border-gray-300 text-black'
+        }`}
         placeholderTextColor={isDarkTheme ? '#bbbbbb' : '#888888'}
+        textAlignVertical="top"
       />
       <CustomButton
-        title={editingIndex !== null ? 'Update Task' : 'Save Task'} // Change button text based on edit mode
+        title={editingIndex !== null ? 'Update Task' : 'Save Task'}
         onPress={handleSaveTask}
         isDarkTheme={isDarkTheme}
       />
@@ -197,55 +202,5 @@ const Countries = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    padding: 16,
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
-  },
-  darkBackground: {
-    backgroundColor: '#121212',
-  },
-  lightBackground: {
-    backgroundColor: '#ffffff',
-  },
-  input: {
-    borderWidth: 1,
-    width: '100%',
-    padding: 8,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  textArea: {
-    height: 100, // Set height for the text area
-    textAlignVertical: 'top', // Align text to the top
-  },
-  darkInput: {
-    borderColor: 'gray',
-    backgroundColor: '#1e1e1e',
-    color: 'white',
-  },
-  lightInput: {
-    borderColor: 'lightgray',
-    backgroundColor: '#ffffff',
-    color: 'black',
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    marginBottom: 10,
-  },
-  darkPicker: {
-    backgroundColor: '#1e1e1e',
-    color: 'white',
-  },
-  lightPicker: {
-    backgroundColor: '#ffffff',
-    color: 'black',
-  },
-});
 
 export default Countries;

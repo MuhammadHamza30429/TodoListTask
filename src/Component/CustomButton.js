@@ -1,39 +1,16 @@
-// CustomButton.js
 import React from 'react';
-import {TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {TouchableOpacity, Text} from 'react-native';
 
 const CustomButton = ({onPress, title, isDarkTheme}) => {
   return (
     <TouchableOpacity
-      style={[
-        styles.button,
-        isDarkTheme ? styles.darkButton : styles.lightButton,
-      ]}
+      className={`p-3 rounded-lg w-full items-center mb-10 ${
+        isDarkTheme ? 'bg-green-600' : 'bg-green-600'
+      }`}
       onPress={onPress}>
-      <Text style={styles.buttonText}>{title}</Text>
+      <Text className="text-white font-bold text-base">{title}</Text>
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    padding: 12,
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  darkButton: {
-    backgroundColor: '#4CAF50', // Green color
-  },
-  lightButton: {
-    backgroundColor: '#4CAF50', // Green color
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});
 
 export default CustomButton;
